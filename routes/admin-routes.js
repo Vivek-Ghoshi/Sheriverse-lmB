@@ -20,7 +20,7 @@ router.get('/logout', authenticateAdmin, adminLogout);
 
 router.post('/course/create',
     upload.fields([
-        {name:'video',maxCount: 10},
+        {name:'video',maxCount: 1},
         {name:'image',maxCount: 1}
     ]), authenticateAdmin, createCourse); 
 router.get('/course/delete/:id', authenticateAdmin, deleteCourse); 

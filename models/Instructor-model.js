@@ -10,6 +10,12 @@ const instructorSchema = new mongoose.Schema({
        required:true,
        trim: true
     },
+    experience:{
+        type:String,
+    },
+    specialization:{
+       type:String,
+    },
     coursesTaught: [{ type: mongoose.Schema.Types.ObjectId, ref: 'courses' }]
 }, { timestamps: true });
 

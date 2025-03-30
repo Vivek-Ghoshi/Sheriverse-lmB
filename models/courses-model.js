@@ -6,6 +6,10 @@ const courseSchema = new mongoose.Schema({
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'instructor', required: true },
     studentsEnrolled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'student' }],
     price: { type: Number, required: true },
+    duration:{
+        type: String,
+        required:true
+    },
     videoUrl: { type: String }, // Store Cloudinary video URL
     thumbnailUrl: { type: String },
 }, { timestamps: true });

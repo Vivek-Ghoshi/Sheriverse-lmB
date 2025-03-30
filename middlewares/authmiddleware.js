@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken');
 const autoriseUser = (requiredRole) =>{
     return (req,res,next) =>{
         try {
-           console.log("request aai h middleware tak");
+            console.log("request aai h middleware tak");
             const token = req.cookies.token;
-            console.log("token bhi mila");
+            
             if(!token){
                 return res.status(401).json({message:"no token provided"})
             }
-
+            console.log("token bhi mila");
             const decoded = jwt.verify(token,process.env.JWT_TOKEN);
             
             req.user = decoded;
