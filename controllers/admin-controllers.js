@@ -61,8 +61,6 @@ exports.adminLogout = (req, res) => {
 exports.createCourse = async (req, res) => {
   try {
     const { title, description, instructor, price,duration } = req.body;
-    console.log("body ka data",req.body)
-    console.log("files ka data",req.files)
     if (!req.files) {
       console.log("file and image is required");
     }
@@ -72,7 +70,7 @@ exports.createCourse = async (req, res) => {
     if (!instractorDetails) {
       console.log("no instractor found with this name");
     }
-    
+
     const videoUrl =
       req.files["video"][0].path || req.files["video"][0].secure_url;
     const thumbnailUrl =
@@ -141,3 +139,12 @@ exports.removeInstructor = async (req, res) => {
     res.status(500).json({ message: "Error removing instructor", error });
   }
 };
+exports.allInstructors = async(req,res) =>{
+  try {
+    const instructors = await instructorModel.find();
+    if(!instructors) console.log("no instructors found");
+    res.json(instructors);
+  } catch (error) {
+    console.log(error.message);
+  }
+}

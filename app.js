@@ -5,7 +5,7 @@ const db = require('./config/db');
 const app = express();
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth-routes');
+const commanRoutes = require('./routes/comman-routes');
 const adminRoutes = require('./routes/admin-routes');
 const instructorRoutes = require('./routes/instructor-routes');
 const studentRoutes = require('./routes/student-routes');
@@ -19,7 +19,7 @@ app.use(cors({
 }));
 app.use(cookieParser()); 
 
-app.use('/api/auth',authRoutes);
+app.use('/api',commanRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/instructor',instructorRoutes);
 app.use('/api/student',studentRoutes);

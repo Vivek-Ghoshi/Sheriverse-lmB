@@ -6,10 +6,12 @@ const cloudinary = require('../config/cloudinaryConfig');
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
+        const isVideo = file.mimetype.startsWith('video');
+        const isImage = file.mimetype.startsWith('image');
         return {
             folder: 'Sheriverse Courses', // Cloudinary folder name
-            resource_type: file.mimetype.startsWith('video') ? 'video' : 'image',
-            format: file.mimetype.startsWith('video') ? 'mp4' : 'png',
+            resource_type: isVideo ? 'video' : isImage ? 'image' : 'auto',
+            format: isVideo || isImage ? undefined : 'auto',
         };
     },
 });
