@@ -32,40 +32,31 @@ const logoutInstructor = (req,res)=>{
     }
 }
 
-// @desc    Create a new assignment
-// @route   POST /instructor/assignments
-// @access  Private (Instructor)
 const createAssignment = async (req, res) => {
     try {
         const { title, description, dueDate } = req.body;
-        const instructorId = req.user.id; // Assuming user ID is stored in req.user
-        
-        const newAssignment = new Assignment({ title, description, dueDate, instructor: instructorId });
+        const instructorId = req.user.id;
+        // const file = req.file?.path || req.file?.secure_url;
+        const newAssignment = new Assignment({ title, description, dueDate, instructor: instructorId,
+         });
         await newAssignment.save();
-
-        res.status(201).json({ message: "Assignment created successfully!", assignment: newAssignment });
+        res.status(201).json(newAssignment);
     } catch (error) {
+        console.log(error.message);
         res.status(500).json({ message: "Error creating assignment", error: error.message });
     }
 };
 
-// @desc    Get all assignments by instructor
-// @route   GET /instructor/assignments
-// @access  Private (Instructor)
 const getAssignments = async (req, res) => {
     try {
         const instructorId = req.user.id;
         const assignments = await Assignment.find({ instructor: instructorId });
-
         res.status(200).json(assignments);
     } catch (error) {
         res.status(500).json({ message: "Error fetching assignments", error: error.message });
     }
 };
 
-// @desc    Get submissions for a specific assignment
-// @route   GET /instructor/assignments/:id/submissions
-// @access  Private (Instructor)
 const getAssignmentSubmissions = async (req, res) => {
     try {
         const { id } = req.params;
@@ -83,29 +74,28 @@ const getAssignmentSubmissions = async (req, res) => {
 // @access  Private (Instructor)
 const updateAssignment = async (req, res) => {
     try {
+        console.log("request yha tak aai");
         const { id } = req.params;
         const { title, description, dueDate } = req.body;
-
+        console.log(title, description, dueDate);
         const updatedAssignment = await Assignment.findByIdAndUpdate(
             id,
             { title, description, dueDate },
             { new: true }
         );
-
-        res.status(200).json({ message: "Assignment updated successfully!", assignment: updatedAssignment });
+        console.log("yha se updated assignment bheja");
+        res.status(200).json(updatedAssignment);
     } catch (error) {
         res.status(500).json({ message: "Error updating assignment", error: error.message });
     }
 };
 
-// @desc    Delete an assignment
-// @route   DELETE /instructor/assignments/:id
-// @access  Private (Instructor)
 const deleteAssignment = async (req, res) => {
     try {
         const { id } = req.params;
-
+        console.log(id);
         await Assignment.findByIdAndDelete(id);
+        console.log("assignment deleted");
         res.status(200).json({ message: "Assignment deleted successfully!" });
     } catch (error) {
         res.status(500).json({ message: "Error deleting assignment", error: error.message });

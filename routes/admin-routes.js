@@ -5,7 +5,8 @@ const {
      adminLogin, adminLogout,
      createAdmin,
      createInstructor, removeInstructor,
-     createCourse, deleteCourse 
+     createCourse, deleteCourse, 
+     allInstructors
     }  = require('../controllers/admin-controllers');
 const { authenticateAdmin } = require('../middlewares/authmiddleware');
 
@@ -29,5 +30,5 @@ router.get('/course/delete/:id', authenticateAdmin, deleteCourse);
 
 router.post('/instructor/create', authenticateAdmin, createInstructor); 
 router.get('/instructor/remove/:id', authenticateAdmin, removeInstructor); 
-
+router.get('/all-instructors',authenticateAdmin,allInstructors);
 module.exports = router;

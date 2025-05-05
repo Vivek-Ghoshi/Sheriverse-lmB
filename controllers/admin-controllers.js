@@ -39,7 +39,6 @@ exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
   const admin = await adminModel.findOne({ email });
   if (!admin) return res.status(400).json({ message: "Invalid credentials" });
-
   const isMatch = await bcrypt.compare(password, admin.password);
   if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
@@ -133,6 +132,7 @@ exports.createInstructor = async (req, res) => {
 exports.removeInstructor = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id);
     await instructorModel.findByIdAndDelete(id);
     res.json({ message: "Instructor removed successfully" });
   } catch (error) {

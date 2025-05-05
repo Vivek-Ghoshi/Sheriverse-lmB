@@ -57,27 +57,11 @@ const logoutUser = (req, res) => {
     console.log("logout sucessfully")
     res.json({ message: 'Logged out successfully' });
 };
-// @desc    Get all available courses
-// @route   GET /student/courses
-// @access  Private (Student)
 
-const getAllCourses = async (req, res) => {
-    try {
-        
-        const courses = await courseModel.find().select("-content").populate("instructor","name"); // Course content exclude kiya hai
-        res.status(200).json(courses);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching courses", error: error.message });
-    }
-};
 
-// @desc    Get a specific course by ID
-// @route   GET /student/courses/:id
-// @access  Private (Student)
 const getCourseById = async (req, res) => {
     try {
-        console.log("ye bhi chala");
-        const course = await courseModel.findById(req.params.id);
+        const course = await courseModel.findById(req.params.id).populate("instructor","name");
         if (!course) return res.status(404).json({ message: "Course not found" });
 
         res.status(200).json(course);
@@ -86,24 +70,25 @@ const getCourseById = async (req, res) => {
     }
 };
 
-// @desc    Enroll in a course
-// @route   POST /student/courses/:id/enroll
-// @access  Private (Student)
-
 const enrollCourse = async (req, res) => {
-    try {
-       
+    try { 
+        console.log("request controller tak pahuchi j");
         const studentId = req.user.id;
         const courseId = req.params.id;
         
         // Check if already enrolled
         const existingEnrollment = await enrollmentModel.findOne({ student: studentId, course: courseId });
+
         if (existingEnrollment) return res.status(400).json({ message: "Already enrolled in this course" });
 
         const newEnrollment = new enrollmentModel({ student: studentId, course: courseId });
         await newEnrollment.save();
-
-        res.status(201).json({ message: "Successfully enrolled in the course", enrollment: newEnrollment });
+        if(newEnrollment){
+            const course = await courseModel.findOne({courseId})
+            course.studentsEnrolled.push(studentId);
+            await course.save();
+        }
+        res.status(201).json({enrollment: newEnrollment});
     } catch (error) {
         res.status(500).json({ message: "Error enrolling in course", error: error.message });
     }
@@ -116,20 +101,14 @@ const enrollCourse = async (req, res) => {
 const getEnrolledCourses = async (req, res) => {
     try {
         const studentId = req.user.id;
-        const enrollments = await enrollmentModel.findOne({ student: studentId }).populate("course", "title description");
-  // i can use this afterwards (enrollments.map(enrollment => enrollment.course)) 
-
-        res.status(200).json({message: "your enrollled courses are fetched sucessfully",
-            courses : enrollments.course,
-        });
+        const enrollments = await enrollmentModel.findOne({ student: studentId }).populate("course", "title description thumbnailUrl");
+        // i can use this afterwards (enrollments.map(enrollment => enrollment.course)) 
+        
+        res.status(200).json(enrollments.course);
     } catch (error) {
         res.status(500).json({ message: "Error fetching enrolled courses", error: error.message });
     }
 };
-
-// @desc    Get course content (if enrolled)
-// @route   GET /student/courses/:id/content
-// @access  Private (Student)
 
 const getCourseContent = async (req, res) => {
     try {
@@ -147,9 +126,16 @@ const getCourseContent = async (req, res) => {
     }
 };
 
-// @desc    Submit an assignment
-// @route   POST /student/assignments/:id/submit
-// @access  Private (Student)
+const assignments = async (req,res)=>{
+    try {
+        const assignment = await assignmentModel.find();
+        if(!assignment) console.log("no assignment found");
+        res.json(assignment);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const submitAssignment = async (req, res) => {
     try {
         const { fileUrl } = req.body;
@@ -173,10 +159,10 @@ module.exports = {
     loginUser,
     registerUser,
     logoutUser,
-    getAllCourses,
     getCourseById,
     enrollCourse,
     getEnrolledCourses,
     getCourseContent,
+    assignments,
     submitAssignment
 };

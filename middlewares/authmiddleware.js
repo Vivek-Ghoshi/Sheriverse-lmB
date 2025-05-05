@@ -5,7 +5,6 @@ const autoriseUser = (requiredRole) =>{
         try {
             console.log("request aai h middleware tak");
             const token = req.cookies.token;
-            
             if(!token){
                 return res.status(401).json({message:"no token provided"})
             }
