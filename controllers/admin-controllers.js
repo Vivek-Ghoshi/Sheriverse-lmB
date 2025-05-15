@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 const courseModel = require("../models/courses-model");
 const instructorModel = require("../models/Instructor-model");
 const adminModel = require("../models/admin-model");
@@ -52,7 +53,9 @@ exports.adminLogin = async (req, res) => {
 
 // Admin Logout
 exports.adminLogout = (req, res) => {
+  console.log("logout hit hua");
   res.clearCookie("token");
+  console.log("logout hit token clear hua");
   res.json({ message: "Logged out successfully" });
 };
 
@@ -81,7 +84,7 @@ exports.createCourse = async (req, res) => {
       price,
       duration,
       thumbnailUrl,
-      videoUrl
+      introUrl: videoUrl
     });
     res.status(201).json({ message: "Course created successfully", course });
   } catch (error) {
@@ -139,11 +142,46 @@ exports.removeInstructor = async (req, res) => {
     res.status(500).json({ message: "Error removing instructor", error });
   }
 };
+
+//view all instructors
 exports.allInstructors = async(req,res) =>{
   try {
     const instructors = await instructorModel.find();
     if(!instructors) console.log("no instructors found");
     res.json(instructors);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+//upload course content
+
+exports.uploadContent = async(req,res) =>{
+  try {
+    const {titles, descriptions, orders} = req.body;
+    const files = req.files;
+    const courseId = req.params.id;
+
+    if(!files || files.length === 0){
+       return res.json({success: false , message: "no files are uploaded"});
+    }
+    
+    const uploadedVideos = files.map((file,index)=>({
+      title: Array.isArray(titles) ? titles[index]: titles,
+      description: Array.isArray(descriptions) ? descriptions[index] : descriptions,
+      orders: Array.isArray(orders) ? orders[index] : orders,
+      url: file.path,
+      public_id: file.filename,
+    }))
+      const course = await courseModel.findById(courseId);
+      if(!course){
+         return res.status(404).res.json({success: false , message: "course not found"});
+      }
+      course.videoUrls.push(...uploadedVideos);
+      await course.save();
+      console.log('videos uploaded');
+      res.json({success:true, videos: uploadedVideos});
+
   } catch (error) {
     console.log(error.message);
   }

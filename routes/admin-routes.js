@@ -6,7 +6,8 @@ const {
      createAdmin,
      createInstructor, removeInstructor,
      createCourse, deleteCourse, 
-     allInstructors
+     allInstructors,
+     uploadContent
     }  = require('../controllers/admin-controllers');
 const { authenticateAdmin } = require('../middlewares/authmiddleware');
 
@@ -18,7 +19,6 @@ router.post('/login', adminLogin);
 router.get('/logout', authenticateAdmin, adminLogout); 
 
 // Course Management Routes
-
 router.post('/course/create',
     upload.fields([
         {name:'video',maxCount: 1},
@@ -31,4 +31,5 @@ router.get('/course/delete/:id', authenticateAdmin, deleteCourse);
 router.post('/instructor/create', authenticateAdmin, createInstructor); 
 router.get('/instructor/remove/:id', authenticateAdmin, removeInstructor); 
 router.get('/all-instructors',authenticateAdmin,allInstructors);
+router.post('/courses/:id/add-content',upload.array("videos"),authenticateAdmin,uploadContent);
 module.exports = router;
