@@ -179,7 +179,6 @@ exports.uploadContent = async(req,res) =>{
       }
       course.videoUrls.push(...uploadedVideos);
       await course.save();
-      console.log('videos uploaded');
       res.json({success:true, videos: uploadedVideos});
 
   } catch (error) {

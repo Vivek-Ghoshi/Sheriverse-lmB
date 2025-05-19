@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require('../config/multer-config');
 const { 
     registerUser,
     loginUser,
@@ -9,7 +10,8 @@ const {
     getEnrolledCourses, 
     getCourseContent, 
     submitAssignment, 
-    assignments
+    assignments,
+    editStudentProfile
 } = require("../controllers/Student-controllers");
 const { authenticateStudent } = require("../middlewares/authmiddleware");
 
@@ -27,6 +29,7 @@ router.get("/courses/:id/enroll", authenticateStudent, enrollCourse); // Enroll 
 router.get("/enrolled-courses", authenticateStudent, getEnrolledCourses); // View enrolled courses
 router.get("/courses/:id/content", authenticateStudent, getCourseContent); // Access course content
 router.get("/assignments",authenticateStudent,assignments);
-router.post("/assignments/:id/submit", authenticateStudent, submitAssignment); // Submit assignment
+router.post("/assignments/:id/submit", authenticateStudent, submitAssignment); // submit assignment
+router.post("/edit-profile",authenticateStudent,upload.single('image'),editStudentProfile)
 
 module.exports = router;

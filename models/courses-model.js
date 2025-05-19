@@ -13,9 +13,7 @@ const courseSchema = new mongoose.Schema({
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'instructor', required: true },
     studentsEnrolled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'student' }],
     price: { type: Number, required: true },
-    duration:{
-        type: String,
-    },
+    duration:{type: String},
     introUrl:{ type: String},
     videoUrls: [videoSchema],
     thumbnailUrl: { type: String },

@@ -11,7 +11,16 @@ const storage = new CloudinaryStorage({
         return {
             folder: 'Sheriverse Courses', // Cloudinary folder name
             resource_type: isVideo ? 'video' : isImage ? 'image' : 'auto',
-            format: isVideo || isImage ? undefined : 'auto',
+            format:undefined,
+            eager: isVideo
+            ? [
+                  {
+                      streaming_profile: 'auto',
+                      format: 'm3u8',
+                    },
+              ]
+            : undefined,
+            eager_async: isVideo ? true : undefined,
         };
     },
 });

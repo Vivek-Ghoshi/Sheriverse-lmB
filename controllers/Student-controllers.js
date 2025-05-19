@@ -155,6 +155,43 @@ const submitAssignment = async (req, res) => {
     }
 };
 
+const editStudentProfile = async (req, res) => {
+  try {
+    const studentId = req.user.id; // set by auth middleware
+    const { name, phone, bio } = req.body;
+    let profilePicUrl;
+    console.log(name ,phone,bio);
+    // Handle profilePic upload if file is provided
+    if (req.file) {
+      profilePicUrl = req.file.secure_url || req.file.path;
+    }
+    console.log("profilepicurl : ",profilePicUrl);
+    // Fetch student
+    const student = await studentModel.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Update only provided fields
+    if (name) student.name = name;
+    if (phone) student.phone = phone;
+    if (bio) student.bio = bio;
+    if (profilePicUrl) student.profile = profilePicUrl;
+
+    await student.save();
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      student,
+    });
+  } catch (error) {
+    console.error("Error updating student profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while updating profile",
+    });
+  }
+};
 module.exports = {
     loginUser,
     registerUser,
@@ -164,5 +201,6 @@ module.exports = {
     getEnrolledCourses,
     getCourseContent,
     assignments,
-    submitAssignment
+    submitAssignment,
+    editStudentProfile,
 };
