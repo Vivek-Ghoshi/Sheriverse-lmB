@@ -14,22 +14,24 @@ const {
     editStudentProfile
 } = require("../controllers/Student-controllers");
 const { authenticateStudent } = require("../middlewares/authmiddleware");
+const { celebrate } = require("celebrate");
+const { registerValidation, loginValidation, getCourseByIdValidation, enrollCourseValidation, getCourseContentValidation, submitAssignmentValidation, editStudentProfileValidation } = require("../utils/validations/authValidation");
 
 // Routes for students
-router.post('/register', registerUser);
+router.post('/register',celebrate(registerValidation) ,registerUser);
 
 // Login Route
-router.post('/login', loginUser);
+router.post('/login',celebrate(loginValidation), loginUser);
 
 // Logout Route
 router.get('/logout',authenticateStudent, logoutUser);
  // Get all available courses
-router.get("/courses/:id", authenticateStudent, getCourseById); // Get specific course details
-router.get("/courses/:id/enroll", authenticateStudent, enrollCourse); // Enroll in a course
+router.get("/courses/:id", authenticateStudent,celebrate(getCourseByIdValidation), getCourseById); // Get specific course details
+router.get("/courses/:id/enroll", authenticateStudent,celebrate(enrollCourseValidation), enrollCourse); // Enroll in a course
 router.get("/enrolled-courses", authenticateStudent, getEnrolledCourses); // View enrolled courses
-router.get("/courses/:id/content", authenticateStudent, getCourseContent); // Access course content
+router.get("/courses/:id/content", authenticateStudent,celebrate(getCourseContentValidation), getCourseContent); // Access course content
 router.get("/assignments",authenticateStudent,assignments);
-router.post("/assignments/:id/submit", authenticateStudent, submitAssignment); // submit assignment
-router.post("/edit-profile",authenticateStudent,upload.single('image'),editStudentProfile)
+router.post("/assignments/:id/submit", authenticateStudent,celebrate(submitAssignmentValidation), submitAssignment); // submit assignment
+router.post("/edit-profile",authenticateStudent,upload.single('image'),celebrate(editStudentProfileValidation),editStudentProfile)
 
 module.exports = router;

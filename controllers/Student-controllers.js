@@ -72,7 +72,6 @@ const getCourseById = async (req, res) => {
 
 const enrollCourse = async (req, res) => {
     try { 
-        console.log("request controller tak pahuchi j");
         const studentId = req.user.id;
         const courseId = req.params.id;
         

@@ -10,6 +10,7 @@ const commanRoutes = require('./routes/comman-routes');
 const adminRoutes = require('./routes/admin-routes');
 const instructorRoutes = require('./routes/instructor-routes');
 const studentRoutes = require('./routes/student-routes');
+const paymentRoutes = require('./routes/payment-routes');
 // const aiRoutes = require('./routes/ai-routes');
 
 app.use(express.json()); 
@@ -23,6 +24,7 @@ app.use('/api',commanRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/instructor',instructorRoutes);
 app.use('/api/student',studentRoutes);
+app.use('/api/payment',paymentRoutes);
 // app.use('/api/ai',aiRoutes); // not working currently soon i will add this functionality too
 
 const port = process.env.PORT || 4000;

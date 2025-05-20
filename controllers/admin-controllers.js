@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 const courseModel = require("../models/courses-model");
 const instructorModel = require("../models/Instructor-model");
+const studentModel = require("../models/student-model");
 const adminModel = require("../models/admin-model");
 
 //create Admin
@@ -155,7 +156,6 @@ exports.allInstructors = async(req,res) =>{
 }
 
 //upload course content
-
 exports.uploadContent = async(req,res) =>{
   try {
     const {titles, descriptions, orders} = req.body;
@@ -181,6 +181,31 @@ exports.uploadContent = async(req,res) =>{
       await course.save();
       res.json({success:true, videos: uploadedVideos});
 
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+// get all student users
+exports.getStudents = async(req,res)=>{
+  try {
+    const students = await studentModel.find();
+    if(!students){
+      return res.json({message:"No students are registerd Yet."})
+    }
+    res.json({students});
+  } catch (error) {
+    console.log(err.message);
+  }
+}
+
+//get all admin users
+exports.getAdmins = async(req,res)=>{
+  try {
+    const admins = await adminModel.find();
+    if(!admins) return res.json({message:"no admins found"});
+
+    res.json({admins});
   } catch (error) {
     console.log(error.message);
   }
