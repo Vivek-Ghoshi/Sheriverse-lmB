@@ -3,6 +3,7 @@ const crypto = require("crypto");
 require('dotenv').config();
 const courseModel = require('../models/courses-model');
 const enrollmentModel = require('../models/enrollment-model');
+const studentModel = require("../models/student-model");
 
 const razorpayInstance = new razorpay({
     key_id : process.env.RAZOR_KEY_ID,
@@ -49,13 +50,24 @@ exports.verifyPayment = async(req,res)=>{
           .digest("hex")
 
         if(expectedSignature === razorpay_signature){
-            await enrollmentModel.create({
-                student: req.user.id,
+            const user = req.user.id;
+            const alreadyEnrolled = await enrollmentModel.findOne({user,course:courseId});
+            if(!alreadyEnrolled){
+                await enrollmentModel.create({
+                student: user,
                 course: courseId,
                 paymentId: razorpay_payment_id,
             });
-            console.log("verify is also success");
-            res.json({sucess: true,courseId});
+
+            // Adding this Course in Student model
+            await studentModel.findByIdAndUpdate(
+            user,
+            { $addToSet: { enrolledCourses: courseId } }, // $addToSet prevents duplicates
+            { new: true }
+        );
+            
+        }
+        res.json({sucess: true});
         }else{
             res.status(400).json({error:"invalid signatue"})
         }  

@@ -17,15 +17,15 @@ const registerUser = async (req, res) => {
      
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password,salt);
-    const newUser = await studentModel.create({
+    const user = await studentModel.create({
          name,
          email,
          role:"student",
          password: hashedPassword 
         });
-    const token = jwt.sign({email:newUser.email,id:newUser._id,role:newUser.role},process.env.JWT_TOKEN);
+    const token = jwt.sign({email:user.email,id:user._id,role:user.role},process.env.JWT_TOKEN);
     res.cookie('token',token);
-    res.status(201).json({ message: 'User registered successfully',newUser });
+    res.status(201).json(user);
     }
     catch(err){
         console.log(err.message);
@@ -42,19 +42,17 @@ const loginUser = async (req, res) => {
 
     // Compare Passwords
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
     // Generate Token
     const token = jwt.sign({ email: user.email,id:user._id, role:user.role}, process.env.JWT_TOKEN);
     res.cookie('token', token);
-    res.json({ message: 'Login successful', user});
+    res.json(user);
 };
 
 // Logout User
 const logoutUser = (req, res) => {
-    console.log("logout route hit hua")
     res.clearCookie('token');
-    console.log("logout sucessfully")
     res.json({ message: 'Logged out successfully' });
 };
 
@@ -100,10 +98,9 @@ const enrollCourse = async (req, res) => {
 const getEnrolledCourses = async (req, res) => {
     try {
         const studentId = req.user.id;
-        const enrollments = await enrollmentModel.findOne({ student: studentId }).populate("course", "title description thumbnailUrl");
-        // i can use this afterwards (enrollments.map(enrollment => enrollment.course)) 
-        
-        res.status(200).json(enrollments.course);
+        const enrollments = await enrollmentModel.find({ student: studentId }).populate("course", "title description thumbnailUrl");
+        const enrolledCourses =  (enrollments.map(enrollment => enrollment.course)) 
+        res.status(200).json(enrolledCourses);
     } catch (error) {
         res.status(500).json({ message: "Error fetching enrolled courses", error: error.message });
     }
@@ -159,7 +156,6 @@ const editStudentProfile = async (req, res) => {
     const studentId = req.user.id; // set by auth middleware
     const { name, phone, bio } = req.body;
     let profilePicUrl;
-    console.log(name ,phone,bio);
     // Handle profilePic upload if file is provided
     if (req.file) {
       profilePicUrl = req.file.secure_url || req.file.path;
@@ -181,7 +177,6 @@ const editStudentProfile = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      student,
     });
   } catch (error) {
     console.error("Error updating student profile:", error);
@@ -191,6 +186,17 @@ const editStudentProfile = async (req, res) => {
     });
   }
 };
+
+const getProfile = async(req,res)=>{
+    try {
+        const userId = req.user.id;
+        const profile = await studentModel.findById(userId);
+        if(!profile) return res.json({message:"no profile found with this"});
+        res.json(profile);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 module.exports = {
     loginUser,
     registerUser,
@@ -202,4 +208,5 @@ module.exports = {
     assignments,
     submitAssignment,
     editStudentProfile,
+    getProfile,
 };

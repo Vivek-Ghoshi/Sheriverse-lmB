@@ -11,7 +11,8 @@ const {
     getCourseContent, 
     submitAssignment, 
     assignments,
-    editStudentProfile
+    editStudentProfile,
+    getProfile
 } = require("../controllers/Student-controllers");
 const { authenticateStudent } = require("../middlewares/authmiddleware");
 const { celebrate } = require("celebrate");
@@ -33,5 +34,6 @@ router.get("/courses/:id/content", authenticateStudent,celebrate(getCourseConten
 router.get("/assignments",authenticateStudent,assignments);
 router.post("/assignments/:id/submit", authenticateStudent,celebrate(submitAssignmentValidation), submitAssignment); // submit assignment
 router.post("/edit-profile",authenticateStudent,upload.single('image'),celebrate(editStudentProfileValidation),editStudentProfile)
+router.get("/profile",authenticateStudent,getProfile);
 
 module.exports = router;

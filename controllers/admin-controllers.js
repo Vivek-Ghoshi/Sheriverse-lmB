@@ -42,21 +42,19 @@ exports.adminLogin = async (req, res) => {
   const admin = await adminModel.findOne({ email });
   if (!admin) return res.status(400).json({ message: "Invalid credentials" });
   const isMatch = await bcrypt.compare(password, admin.password);
-  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+  if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
   let token = jwt.sign(
     { email: admin.email, id: admin._id, role: admin.role },
     process.env.JWT_TOKEN
   );
   res.cookie("token", token);
-  res.status(200).json({ admin });
+  res.status(200).json(admin);
 };
 
 // Admin Logout
 exports.adminLogout = (req, res) => {
-  console.log("logout hit hua");
   res.clearCookie("token");
-  console.log("logout hit token clear hua");
   res.json({ message: "Logged out successfully" });
 };
 
@@ -68,7 +66,7 @@ exports.createCourse = async (req, res) => {
       console.log("file and image is required");
     }
     const instractorDetails = await instructorModel.findOne({
-      name: instructor,
+       name: { $regex: new RegExp(`^${instructor}$`, "i") },
     });
     if (!instractorDetails) {
       console.log("no instractor found with this name");
@@ -204,8 +202,7 @@ exports.getAdmins = async(req,res)=>{
   try {
     const admins = await adminModel.find();
     if(!admins) return res.json({message:"no admins found"});
-
-    res.json({admins});
+    res.json(admins);
   } catch (error) {
     console.log(error.message);
   }
