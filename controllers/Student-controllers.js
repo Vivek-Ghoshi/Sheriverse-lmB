@@ -24,7 +24,11 @@ const registerUser = async (req, res) => {
          password: hashedPassword 
         });
     const token = jwt.sign({email:user.email,id:user._id,role:user.role},process.env.JWT_TOKEN);
-    res.cookie('token',token);
+    res.cookie('token',token,{
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"  // 🔥 Required for cross-origin cookies
+});
     res.status(201).json(user);
     }
     catch(err){
@@ -35,7 +39,7 @@ const registerUser = async (req, res) => {
 // Login User
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
+    console.log("chala");
     // Find User
     const user = await studentModel.findOne({email});
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
@@ -46,7 +50,12 @@ const loginUser = async (req, res) => {
 
     // Generate Token
     const token = jwt.sign({ email: user.email,id:user._id, role:user.role}, process.env.JWT_TOKEN);
-    res.cookie('token', token);
+    res.cookie('token', token,{
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"  // 🔥 Required for cross-origin cookies
+});
+    console.log("send user");
     res.json(user);
 };
 

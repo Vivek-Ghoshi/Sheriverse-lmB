@@ -30,7 +30,11 @@ exports.createAdmin = async (req, res) => {
       { email: newAdmin.email, id: newAdmin._id, role: newAdmin.role },
       process.env.JWT_TOKEN
     );
-    res.cookie("token", token);
+    res.cookie("token", token,{
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"  // 🔥 Required for cross-origin cookies
+});
     res.status(200).json(newAdmin);
   } catch (error) {
     console.log(error.message);
@@ -48,7 +52,11 @@ exports.adminLogin = async (req, res) => {
     { email: admin.email, id: admin._id, role: admin.role },
     process.env.JWT_TOKEN
   );
-  res.cookie("token", token);
+  res.cookie("token", token,{
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"  // 🔥 Required for cross-origin cookies
+});
   res.status(200).json(admin);
 };
 
