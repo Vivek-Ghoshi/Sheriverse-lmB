@@ -6,6 +6,22 @@ const app = express();
 const path = require("path");
 require('dotenv').config();
 
+app.use((req, res, next) => {
+  console.log("Request origin:", req.headers.origin);
+  console.log("Cookies:", req.headers.cookie);
+  next();
+});
+const allowedOrigin = 'https://sheriverse.onrender.com'
+app.use(cors({
+    origin: allowedOrigin, 
+    credentials: true ,
+    methods: ['GET', 'POST','OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors({
+  origin: allowedOrigin,
+  credentials: true,
+}));
 const commanRoutes = require('./routes/comman-routes');
 const adminRoutes = require('./routes/admin-routes');
 const instructorRoutes = require('./routes/instructor-routes');
@@ -15,16 +31,7 @@ const paymentRoutes = require('./routes/payment-routes');
 
 app.use(express.json()); 
 app.use(express.urlencoded({extended:true}));
-app.use(cors({
-    origin: 'https://sheriverse.onrender.com/', 
-    credentials: true ,
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-app.options('*', cors({
-  origin: 'https://sheriverse.onrender.com',
-  credentials: true,
-}));
+
 app.use(cookieParser()); 
 app.use('/api',commanRoutes);
 app.use('/api/admin',adminRoutes);
