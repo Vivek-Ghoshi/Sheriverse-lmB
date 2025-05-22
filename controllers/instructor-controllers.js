@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const loginInstructor = async (req, res) => {
   try {
     const { email, password } = req.body;
-    let instructor = await instructorModel.findOne({ email });
+    let instructor = await instructorModel.findOne({ email:new RegExp(`^${email}$`, 'i') });
     if (!instructor) res.status(401).send("no account found with this email");
 
     const isMatch = await bcrypt.compare(password, instructor.password);

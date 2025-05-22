@@ -43,7 +43,7 @@ exports.createAdmin = async (req, res) => {
 // Admin Login
 exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
-  const admin = await adminModel.findOne({ email });
+  const admin = await adminModel.findOne({ email:new RegExp(`^${email}$`, 'i') });
   if (!admin) return res.status(400).json({ message: "Invalid credentials" });
   const isMatch = await bcrypt.compare(password, admin.password);
   if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
